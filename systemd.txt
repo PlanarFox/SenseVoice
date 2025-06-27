@@ -1,0 +1,62 @@
+[Unit]
+Description=SenseVoice OpenAI-Compatible API Service
+Documentation=https://github.com/FunAudioLLM/SenseVoice
+After=network.target
+
+[Service]
+Type=exec
+
+# Working directory - where your API code is located
+WorkingDirectory=/path/to/working/dir/SenseVoice/
+
+# Environment variables
+Environment="PYTHONUNBUFFERED=1"
+
+# SenseVoice configuration
+Environment="SENSEVOICE_MODEL_DIR=iic/SenseVoiceSmall"
+Environment="SENSEVOICE_DEVICE=cuda:0"
+Environment="SENSEVOICE_VAD_MODEL=fsmn-vad"
+Environment="SENSEVOICE_MAX_SINGLE_SEGMENT_TIME=30000"
+
+# API configuration
+Environment="SENSEVOICE_API_HOST=127.0.0.1"
+Environment="SENSEVOICE_API_PORT=33333"
+Environment="SENSEVOICE_API_KEY=anything"
+
+# CUDA environment (adjust based on your system)
+Environment="CUDA_VISIBLE_DEVICES=0"
+#Environment="CUDA_HOME=/usr/local/cuda"
+#Environment="LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH"
+
+# Model cache directory (optional, for modelscope/huggingface)
+#Environment="MODELSCOPE_CACHE={/home/YOUR_USERNAME}/.cache/modelscope"
+#Environment="HF_HOME={/home/YOUR_USERNAME}/.cache/huggingface"
+
+# Execute the service using uv environment's Python
+ExecStart=/path/to/env/.venv/bin/python /path/to/python/file/sensevoice_openai_api.py
+
+# Restart configuration
+Restart=always
+RestartSec=10
+KillMode=mixed
+KillSignal=SIGINT
+TimeoutStopSec=90
+
+# Security settings (optional but recommended)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+
+# Resource limits (adjust based on your needs)
+LimitNOFILE=65536
+# Uncomment to limit memory usage
+# MemoryLimit=8G
+
+# Standard output/error handling
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=sensevoice-api
+
+[Install]
+WantedBy=multi-user.target
